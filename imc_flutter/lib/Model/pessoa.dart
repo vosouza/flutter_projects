@@ -3,6 +3,7 @@ class Pessoa{
   String? _nome;
   double? _altura;
   double? _peso;
+  double? _imc;
 
   Pessoa({String? nome, double? altura, double? peso}){
     _nome = nome;
@@ -39,6 +40,16 @@ class Pessoa{
   }
 
   void setPeso(double peso) => _peso = peso;
+
+  double getIMC() {
+    if(_imc == null){
+      throw const FormatException('imc nao fornecido');
+    }else{
+      return _peso!;
+    }
+  }
+
+  void setIMC(double imc) => _imc = imc;
 
   @override
   String toString() {
