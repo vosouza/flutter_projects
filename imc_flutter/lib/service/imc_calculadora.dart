@@ -1,4 +1,4 @@
-import '../Model/pessoa.dart';
+import 'package:imc_flutter/Model/pessoa.dart';
 
 class ImcCalculadora{
 
