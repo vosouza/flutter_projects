@@ -1,71 +1,88 @@
+import 'package:back4app_cep/model/cep_model.dart';
+import 'package:back4app_cep/repository/cep_repository.dart';
 import 'package:flutter/material.dart';
 
-import '../settings/settings_view.dart';
-import 'sample_item.dart';
 import 'sample_item_details_view.dart';
 
-/// Displays a list of SampleItems.
-class SampleItemListView extends StatelessWidget {
-  const SampleItemListView({
-    super.key,
-    this.items = const [SampleItem(1), SampleItem(2), SampleItem(3)],
-  });
-
+class SampleItemListView extends StatefulWidget {
   static const routeName = '/';
 
-  final List<SampleItem> items;
+  const SampleItemListView({super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+    return SampleItemListViewState();
+  }
+}
+
+/// Displays a list of SampleItems.
+class SampleItemListViewState extends State {
+  final TextEditingController cepTextController = TextEditingController();
+  var items = <CepModel>[];
+  CepRepository repository = CepRepository();
+
+  @override
+  void initState() {
+    repository.getCEPlist().then((value) => {
+          setState(() {
+            items.addAll(value);
+          })
+        });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Items'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            },
+        title: const Text('Lista de CEPs'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(18.0),
+            child: TextField(
+              controller: cepTextController,
+              decoration: InputDecoration(
+                hintText: "Digite um CEP para receber as informações",
+                suffixIcon: TapRegion(
+                  child: const Icon(Icons.search),
+                  onTapInside: (tap) {
+                    var cep = cepTextController.text.trim();
+                    getCep(cep);
+                  },
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView.builder(
+              reverse: true,
+              restorationId: 'sampleItemListView',
+              itemCount: items.length,
+              itemBuilder: (BuildContext context, int index) {
+                final item = items[index];
+
+                return ListTile(
+                    title: Text('${item.cep}'),
+                    leading: const Icon(Icons.location_on),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SampleItemDetailsView(cep: item,)));
+                    });
+              },
+            ),
           ),
         ],
       ),
-
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'sampleItemListView',
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = items[index];
-
-          return ListTile(
-            title: Text('SampleItem ${item.id}'),
-            leading: const CircleAvatar(
-              // Display the Flutter Logo image asset.
-              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-            ),
-            onTap: () {
-              // Navigate to the details page. If the user leaves and returns to
-              // the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(
-                context,
-                SampleItemDetailsView.routeName,
-              );
-            }
-          );
-        },
-      ),
     );
+  }
+
+  getCep(String cep) {
+    repository.getCEP(cep).then((value) => {
+          setState(() {
+            items.add(value);
+          })
+        });
   }
 }

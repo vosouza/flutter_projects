@@ -10,9 +10,9 @@ environment:
   sdk: '>=3.3.3 <4.0.0'
 
 dependencies:
+  dio: ^5.4.3+1
+  sqflite: ^2.3.3+1
   flutter:
-    sdk: flutter
-  flutter_localizations:
     sdk: flutter
 
 dev_dependencies:
@@ -23,10 +23,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # Enable generation of localized Strings from arb files.
-  generate: true
-
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
