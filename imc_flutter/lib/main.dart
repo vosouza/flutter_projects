@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:imc_flutter/data/sqlite_datasource.dart';
 import 'package:imc_flutter/Model/pessoa.dart';
 import 'package:imc_flutter/service/imc_calculadora.dart';
 
@@ -26,6 +24,20 @@ class MainAppState extends State {
   var pesoController = TextEditingController();
   var alturaController = TextEditingController();
   var imc = 0.0;
+  SQLiteDataSource? db;
+
+  @override
+  void initState() {
+    db = SQLiteDataSource();
+    db?.open().then((_) => {
+          db?.getIMC().then((value) => {
+                setState(() {
+                  imcList.addAll(value);
+                })
+              })
+        });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +98,11 @@ class MainAppState extends State {
                       onPressed: () {
                         var p = double.parse(pesoController.text);
                         var a = double.parse(alturaController.text);
+                        var newPessoa = Pessoa(peso: p, altura: a);
                         setState(() {
-                          var pessoa = Pessoa(peso: p, altura: a);
-                          pessoa.setIMC(calculadora.imc(pessoa));
-                          imcList.add(pessoa);
+                          imcList.add(newPessoa);
                         });
+                        db?.insert(newPessoa);
                       },
                       child: const Text("Calcular"),
                     ),
@@ -114,7 +126,7 @@ class MainAppState extends State {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text("IMC : ${pessoa.getIMC()} "),
+                                Text("IMC : ${calculadora.imc(pessoa)} "),
                                 Text("Peso : ${pessoa.getPeso()} "),
                                 Text("Altura : ${pessoa.getAltura()} "),
                               ],
