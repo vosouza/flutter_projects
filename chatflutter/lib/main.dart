@@ -11,9 +11,7 @@ var getit = GetIt.asNewInstance();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  getit.registerFactory<ChatRepository>((){
-    return ChatRepository(FirebaseFirestore.instance);
-  });
+  getit.registerSingleton<ChatRepository>(ChatRepository(FirebaseFirestore.instance));
 
   runApp(const MyApp());
 }

@@ -23,7 +23,7 @@ class ChatRepository {
     var m = Message(hora: "hora", nome: user?.name ?? "", msg: msg).toJson();
 
     try {
-      await db.collection("chat-geral").add(m).then(
+      await db.collection(canal.chanelName).add(m).then(
             (DocumentReference doc) => print(
               'DocumentSnapshot added with ID: ${doc.id}',
             ),
